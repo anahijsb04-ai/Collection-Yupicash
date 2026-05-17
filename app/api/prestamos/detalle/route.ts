@@ -34,53 +34,51 @@ export async function GET(
     }
 
     const sql = `
-      SELECT
-        id,
+  SELECT
+    id,
 
-        numero_prestamo,
+    numero_prestamo,
 
-        producto,
+    producto,
 
-        valor_deuda as monto,
+    valor_deuda as monto,
 
-        valor_deuda as valorDispersado,
+    valor_deuda as valorDispersado,
 
-        valor_deuda as importe_pagar,
+    valor_deuda as importe_pagar,
 
-        valor_deuda as valorAdeudado,
+    valor_deuda as valorAdeudado,
 
-        COALESCE(
-          nombre_cliente,
-          nombre,
-          'Usuario'
-        ) as nombre_cliente,
+    nombre_cliente,
 
-        telefono_cliente,
+    nombre_cliente as nombre,
 
-        telefono_cliente as telefono,
+    telefono_cliente,
 
-        liga_pago,
+    telefono_cliente as telefono,
 
-        created_at,
+    liga_pago,
 
-        pagado,
+    created_at,
 
-        CASE
-          WHEN pagado = true
-          THEN 'Pagado'
-          ELSE 'Pendiente'
-        END as estado
+    pagado,
 
-      FROM cliente
+    CASE
+      WHEN pagado = true
+      THEN 'Pagado'
+      ELSE 'Pendiente'
+    END as estado
 
-      WHERE telefono_cliente = $1
-        AND liga_pago IS NOT NULL
-        AND liga_pago <> ''
+  FROM cliente
 
-      ORDER BY id DESC
+  WHERE telefono_cliente = $1
+    AND liga_pago IS NOT NULL
+    AND liga_pago <> ''
 
-      LIMIT 1
-    `;
+  ORDER BY id DESC
+
+  LIMIT 1
+`;
 
     const result =
       await query(sql, [
@@ -96,9 +94,6 @@ export async function GET(
       data: item
         ? {
             ...item,
-
-            nombre:
-              item.nombre_cliente,
 
             metodo_pago:
               "SPEI",

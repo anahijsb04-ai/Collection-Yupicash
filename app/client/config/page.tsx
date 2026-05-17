@@ -32,6 +32,11 @@ async function obtenerCliente(
     const data =
       await res.json();
 
+    console.log(
+      "CONFIG_DATA",
+      data
+    );
+
     if (
       !res.ok ||
       !data?.ok
@@ -40,9 +45,11 @@ async function obtenerCliente(
     }
 
     return (
-      data.data || null
+      data?.data || null
     );
-  } catch {
+  } catch (e) {
+    console.error(e);
+
     return null;
   }
 }
@@ -65,6 +72,10 @@ export default async function ConfigPage({
     cliente
       ?.nombre_cliente ||
     cliente?.nombre ||
+    cliente
+      ?.nombreCliente ||
+    cliente
+      ?.cliente ||
     "Usuario";
 
   const Card = ({
