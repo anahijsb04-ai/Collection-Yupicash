@@ -33,7 +33,7 @@ async function obtenerCliente(
       await res.json();
 
     console.log(
-      "CONFIG_DATA",
+      "CONFIG_API:",
       data
     );
 
@@ -45,7 +45,7 @@ async function obtenerCliente(
     }
 
     return (
-      data?.data || null
+      data.data || null
     );
   } catch (e) {
     console.error(e);
@@ -68,15 +68,20 @@ export default async function ConfigPage({
       phone
     );
 
+  console.log(
+    "CLIENTE_CONFIG:",
+    cliente
+  );
+
   const nombre =
-    cliente
-      ?.nombre_cliente ||
-    cliente?.nombre ||
-    cliente
-      ?.nombreCliente ||
-    cliente
-      ?.cliente ||
-    "Usuario";
+    String(
+      cliente
+        ?.nombre_cliente ||
+        cliente?.nombre ||
+        cliente
+          ?.telefono_cliente ||
+        "Usuario"
+    );
 
   const Card = ({
     children,
