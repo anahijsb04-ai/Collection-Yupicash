@@ -1,4 +1,4 @@
-// app/api/prestamos/pendientes/route.ts
+// app/api/prestamos/solicitar/route.ts
 
 import {
   NextRequest,
@@ -8,35 +8,27 @@ import {
 export const runtime =
   "nodejs";
 
-export async function GET(
+export async function POST(
   req: NextRequest
 ) {
   try {
-    const { searchParams } =
-      new URL(req.url);
-
-    const telefono =
-      searchParams.get(
-        "telefono"
-      ) || "";
-
-    const limite =
-      searchParams.get(
-        "limite"
-      ) || "1";
+    const body =
+      await req.json();
 
     const target =
-      `${req.nextUrl.origin}/api/prestamos/pendientes-local` +
-      `?telefono=${encodeURIComponent(
-        telefono
-      )}` +
-      `&limite=${encodeURIComponent(
-        limite
-      )}`;
+      `${req.nextUrl.origin}/api/prestamos/solicitar-local`;
 
     const response = await fetch(
       target,
       {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify(
+          body
+        ),
         cache: "no-store",
       }
     );

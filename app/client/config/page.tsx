@@ -10,20 +10,26 @@ async function obtenerCliente(
   telefono: string
 ) {
   try {
+    if (!telefono) return null;
+
     const base =
       process.env.NEXT_PUBLIC_URL ||
       "http://localhost:3000";
 
     const res = await fetch(
-      `${base}/api/prestamos/detalle?telefono=${encodeURIComponent(
+      `${base}/api/prestamos/pendientes?telefono=${encodeURIComponent(
         telefono
-      )}`,
+      )}&limite=1`,
       {
         cache: "no-store",
       }
     );
 
     const data = await res.json();
+
+    if (Array.isArray(data?.data)) {
+      return data.data[0] || null;
+    }
 
     return data?.data || null;
   } catch {
@@ -45,9 +51,6 @@ export default async function ConfigPage({
 
   const nombre =
     cliente?.nombre_cliente ||
-    cliente?.nombre ||
-    cliente?.cliente ||
-    phone ||
     "Usuario";
 
   const Card = ({
@@ -80,10 +83,7 @@ export default async function ConfigPage({
 
   return (
     <main className="min-h-screen bg-[#f7f5fc] text-[#111827] pb-10">
-
-      {/* HEADER */}
       <section className="relative h-[250px] overflow-hidden">
-
         <img
           src="/images/aa.jpg"
           alt="header"
@@ -93,36 +93,27 @@ export default async function ConfigPage({
         <div className="absolute inset-0 bg-gradient-to-b from-[#12051f]/70 to-[#12051f]/40" />
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-5 text-white">
-
-          {/* AVATAR */}
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/10 text-3xl backdrop-blur-xl shadow-xl">
             👤
           </div>
 
-          <h1 className="mt-5 text-4xl font-black tracking-tight">
+          <h1 className="mt-5 text-4xl font-black tracking-tight text-center">
             {nombre}
           </h1>
 
           <p className="mt-2 text-sm text-white/70">
             Cliente YopiCash
           </p>
-
         </div>
-
       </section>
 
-      {/* BODY */}
       <section className="mx-auto max-w-xl space-y-5 px-5 pt-6">
-
-        {/* CUENTA */}
         <Card>
-
           <h2 className="text-xl font-black text-[#1b1330]">
             Cuenta
           </h2>
 
           <div className="mt-4">
-
             <Item
               label="Nombre"
               value={nombre}
@@ -132,20 +123,15 @@ export default async function ConfigPage({
               label="Teléfono"
               value={phone}
             />
-
           </div>
-
         </Card>
 
-        {/* SEGURIDAD */}
         <Card>
-
           <h2 className="text-xl font-black text-[#1b1330]">
             Seguridad
           </h2>
 
           <div className="mt-4 space-y-2">
-
             <Item
               label="Capturas bloqueadas"
               value="Activo"
@@ -160,14 +146,10 @@ export default async function ConfigPage({
               label="Estado"
               value="Seguro"
             />
-
           </div>
-
         </Card>
 
-        {/* SOPORTE */}
         <Card>
-
           <h2 className="text-xl font-black text-[#1b1330]">
             Soporte
           </h2>
@@ -179,20 +161,14 @@ export default async function ConfigPage({
           <p className="mt-2 break-all text-sm font-bold text-violet-700">
             paymentsreport@yopmail.com
           </p>
-
         </Card>
 
-        {/* LOGOUT */}
         <Link href="/login">
-
           <button className="h-[58px] w-full rounded-[24px] bg-gradient-to-r from-red-500 to-pink-500 font-bold text-white shadow-[0_15px_40px_rgba(239,68,68,0.25)]">
             Cerrar sesión
           </button>
-
         </Link>
-
       </section>
-
     </main>
   );
 }

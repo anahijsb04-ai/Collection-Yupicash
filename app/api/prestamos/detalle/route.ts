@@ -1,35 +1,67 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/prestamos/detalle/route.ts
 
-export const runtime = "nodejs";
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
 
-export async function GET(req: NextRequest) {
+export const runtime =
+  "nodejs";
+
+export async function GET(
+  req: NextRequest
+) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } =
+      new URL(req.url);
 
-    const telefono = searchParams.get("telefono") || "";
-    const id = searchParams.get("id") || "";
+    const telefono =
+      searchParams.get(
+        "telefono"
+      ) || "";
 
-    const url =
-      `https://yupi-cash.vercel.app/api/prestamos/pendientes` +
-      `?telefono=${encodeURIComponent(telefono)}&limite=50`;
+    const id =
+      searchParams.get("id") ||
+      "";
 
-    const res = await fetch(url, { cache: "no-store" });
-    const data = await res.json();
+    const target =
+      `${req.nextUrl.origin}/api/prestamos/detalle-local` +
+      `?telefono=${encodeURIComponent(
+        telefono
+      )}` +
+      `&id=${encodeURIComponent(
+        id
+      )}`;
 
-    const lista = Array.isArray(data?.data) ? data.data : [];
+    const response = await fetch(
+      target,
+      {
+        cache: "no-store",
+      }
+    );
 
-    const item =
-      lista.find((x: any) => String(x.id) === String(id)) ||
-      lista[0] ||
-      null;
+    const text =
+      await response.text();
 
-    return NextResponse.json({
-      ok: true,
-      data: item,
-    });
-  } catch {
+    return new NextResponse(
+      text,
+      {
+        status:
+          response.status,
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+      }
+    );
+  } catch (e: any) {
     return NextResponse.json(
-      { ok: false, error: "Error servidor" },
+      {
+        ok: false,
+        error:
+          e?.message ||
+          "Error servidor",
+      },
       { status: 500 }
     );
   }
