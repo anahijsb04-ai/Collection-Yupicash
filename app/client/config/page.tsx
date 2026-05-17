@@ -15,8 +15,9 @@ async function obtenerCliente(
 
     const base =
       process.env
-        .NEXT_PUBLIC_URL ||
-      "http://localhost:3000";
+        .VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000";
 
     const res = await fetch(
       `${base}/api/prestamos/detalle?telefono=${encodeURIComponent(
@@ -34,7 +35,9 @@ async function obtenerCliente(
     return (
       data?.data || null
     );
-  } catch {
+  } catch (e) {
+    console.error(e);
+
     return null;
   }
 }
