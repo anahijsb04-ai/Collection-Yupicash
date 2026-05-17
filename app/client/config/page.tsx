@@ -10,28 +10,30 @@ async function obtenerCliente(
   telefono: string
 ) {
   try {
-    if (!telefono) return null;
+    if (!telefono)
+      return null;
 
     const base =
-      process.env.NEXT_PUBLIC_URL ||
+      process.env
+        .NEXT_PUBLIC_URL ||
       "http://localhost:3000";
 
     const res = await fetch(
-      `${base}/api/prestamos/pendientes?telefono=${encodeURIComponent(
+      `${base}/api/prestamos/detalle?telefono=${encodeURIComponent(
         telefono
-      )}&limite=1`,
+      )}`,
       {
-        cache: "no-store",
+        cache:
+          "no-store",
       }
     );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
-    if (Array.isArray(data?.data)) {
-      return data.data[0] || null;
-    }
-
-    return data?.data || null;
+    return (
+      data?.data || null
+    );
   } catch {
     return null;
   }
@@ -47,10 +49,14 @@ export default async function ConfigPage({
     params?.phone || "";
 
   const cliente =
-    await obtenerCliente(phone);
+    await obtenerCliente(
+      phone
+    );
 
   const nombre =
-    cliente?.nombre_cliente ||
+    cliente
+      ?.nombre_cliente ||
+    cliente?.nombre ||
     "Usuario";
 
   const Card = ({
