@@ -32,12 +32,17 @@ async function obtenerCliente(
     const data =
       await res.json();
 
-    return (
-      data?.data || null
-    );
-  } catch (e) {
-    console.error(e);
+    if (
+      !res.ok ||
+      !data?.ok
+    ) {
+      return null;
+    }
 
+    return (
+      data.data || null
+    );
+  } catch {
     return null;
   }
 }
