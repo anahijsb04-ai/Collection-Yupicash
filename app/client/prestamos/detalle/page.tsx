@@ -4,19 +4,33 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
 
 type PrestamoDetalle = {
-  id?: string | number;
   producto?: string;
+
   nombre_cliente?: string;
-  importe_pagar?: string | number;
+
+  nombre?: string;
+
+  importe_pagar?:
+    | string
+    | number;
+
+  valorAdeudado?:
+    | string
+    | number;
+
   fecha_vencimiento?: string;
-  cuenta_bancaria?: string;
+
+  liga_pago?: string;
+
   metodo_pago?: string;
+
   metodo_pago_label?: string;
 };
 
@@ -29,9 +43,6 @@ export default function LoanDetailPage() {
 
   const phone =
     params.get("phone") || "";
-
-  const id =
-    params.get("id") || "";
 
   const [loading, setLoading] =
     useState(true);
@@ -66,20 +77,21 @@ export default function LoanDetailPage() {
   async function cargarDetalle() {
     try {
       setLoading(true);
+
       setError("");
 
-      if (!phone || !id) {
+      if (!phone) {
         setError(
           "Datos incompletos"
         );
+
         setLoading(false);
+
         return;
       }
 
       const res = await fetch(
-        `/api/prestamos/detalle?id=${encodeURIComponent(
-          id
-        )}&telefono=${encodeURIComponent(
+        `/api/prestamos/detalle?telefono=${encodeURIComponent(
           phone
         )}`,
         {
@@ -98,24 +110,23 @@ export default function LoanDetailPage() {
         setError(
           "No se pudo cargar el préstamo"
         );
+
         setLoading(false);
+
         return;
       }
 
       const item =
         data?.data ||
-        data?.prestamo ||
-        (Array.isArray(
-          data?.items
-        )
-          ? data.items[0]
-          : null);
+        null;
 
       if (!item) {
         setError(
           "Sin información del préstamo"
         );
+
         setLoading(false);
+
         return;
       }
 
@@ -131,19 +142,19 @@ export default function LoanDetailPage() {
 
   useEffect(() => {
     cargarDetalle();
-  }, [phone, id]);
+  }, [phone]);
 
-  async function copiarCuenta() {
-    const cuenta =
-      prestamo?.cuenta_bancaria ||
+  async function copiarLink() {
+    const link =
+      prestamo?.liga_pago ||
       "No disponible";
 
     await navigator.clipboard.writeText(
-      cuenta
+      link
     );
 
     alert(
-      "Cuenta copiada"
+      "Link copiado"
     );
   }
 
@@ -152,6 +163,7 @@ export default function LoanDetailPage() {
       <main className="min-h-screen bg-[#F2F3F7] flex items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+
           <p className="mt-4 text-gray-500">
             Cargando detalle...
           </p>
@@ -190,32 +202,47 @@ export default function LoanDetailPage() {
     "PRÉSTAMO";
 
   const nombre =
-    prestamo.nombre_cliente ||
+    prestamo
+      .nombre_cliente ||
+    prestamo.nombre ||
     "Cliente";
 
   const importe =
     money(
-      prestamo.importe_pagar
+      prestamo
+        .importe_pagar ||
+        prestamo.valorAdeudado
     );
 
   const fecha =
-    new Date().toLocaleDateString(
-      "es-MX",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }
-    );
+    prestamo.fecha_vencimiento
+      ? new Date(
+          prestamo.fecha_vencimiento
+        ).toLocaleDateString(
+          "es-MX",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+        )
+      : new Date().toLocaleDateString(
+          "es-MX",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+        );
 
-  const cuenta =
-    prestamo.cuenta_bancaria ||
+  const linkPago =
+    prestamo.liga_pago ||
     "No disponible";
 
   const metodo =
     prestamo.metodo_pago ||
     prestamo.metodo_pago_label ||
-    "SPEI";
+    "LINK DE PAGO";
 
   return (
     <main className="min-h-screen bg-[#F2F3F7] text-[#111827]">
@@ -236,6 +263,7 @@ export default function LoanDetailPage() {
             className="flex items-center gap-2 text-white"
           >
             <span>←</span>
+
             <span className="font-semibold">
               Volver
             </span>
@@ -297,21 +325,17 @@ export default function LoanDetailPage() {
 
         <div className="rounded-[28px] bg-blue-50 p-5 text-center ring-1 ring-blue-100">
           <p className="text-sm text-gray-600">
-            TRANSFERENCIA
+            {metodo}
           </p>
 
-          <h4 className="mt-2 text-lg font-bold text-gray-900">
-            {metodo}
-          </h4>
-
-          <p className="mt-4 break-all text-2xl font-extrabold text-blue-700">
-            {cuenta}
+          <p className="mt-4 break-all text-lg font-extrabold text-blue-700">
+            {linkPago}
           </p>
         </div>
 
         <button
           onClick={
-            copiarCuenta
+            copiarLink
           }
           className="h-[56px] w-full rounded-3xl bg-slate-800 font-bold text-white shadow-lg"
         >

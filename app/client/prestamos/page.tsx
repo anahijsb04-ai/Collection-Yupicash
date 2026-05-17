@@ -4,14 +4,17 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import Link from "next/link";
+
 import { useSearchParams } from "next/navigation";
 
 type Prestamo = {
-  id?: string | number;
   producto?: string;
   monto?: string | number;
-  importe_pagar?: string | number;
+  importe_pagar?:
+    | string
+    | number;
 };
 
 export default function PrestamosPage() {
@@ -41,13 +44,16 @@ export default function PrestamosPage() {
   async function cargarPrestamos() {
     try {
       setLoading(true);
+
       setError("");
 
       if (!phone) {
         setError(
           "Número telefónico no detectado"
         );
+
         setLoading(false);
+
         return;
       }
 
@@ -183,7 +189,7 @@ export default function PrestamosPage() {
                 <Link
                   href={`/client/prestamos/detalle?phone=${encodeURIComponent(
                     phone
-                  )}&id=${item.id || ""}`}
+                  )}`}
                 >
                   <button className="mt-5 h-[48px] w-full rounded-2xl bg-blue-600 font-semibold text-white shadow-lg">
                     Ver detalle

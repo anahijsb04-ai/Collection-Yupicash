@@ -22,79 +22,92 @@ export async function GET(
         "telefono"
       );
 
-    const id =
-      searchParams.get("id");
-
-    if (!telefono && !id) {
+    if (!telefono) {
       return NextResponse.json(
         {
           ok: false,
           message:
-            "Telefono o id requerido",
+            "Telefono requerido",
         },
         { status: 400 }
       );
     }
 
-    let sql = `
-      SELECT
-        id,
-        usuario_id,
-        producto,
-        monto,
-        importe_pagar,
-        fecha_vencimiento,
-        dias_vencidos,
-        nombre_cliente,
-        telefono_cliente,
-        cuenta_bancaria,
-        metodo_pago,
-        token,
-        tipo_plantilla,
-        pagado,
-        created_at,
+    const sql = `
+  SELECT
+    id,
 
-        CASE
-          WHEN pagado = true
-          THEN 'Pagado'
-          ELSE 'Pendiente'
-        END as estado
+    numero_prestamo,
 
-      FROM plantillas_temporales
+    producto,
 
-      WHERE 1=1
-    `;
+    valor_deuda as monto,
 
-    const values: any[] = [];
+    valor_deuda as valorDispersado,
 
-    if (telefono) {
-      values.push(telefono);
+    valor_deuda as importe_pagar,
 
-      sql += `
-        AND telefono_cliente = $${values.length}
-      `;
-    }
+    valor_deuda as valorAdeudado,
 
-    if (id) {
-      values.push(id);
+    nombre_cliente,
 
-      sql += `
-        AND id = $${values.length}
-      `;
-    }
+    nombre_cliente as nombre,
 
-    sql += `
-      ORDER BY created_at DESC
-      LIMIT 1
-    `;
+    telefono_cliente,
+
+    telefono_cliente as telefono,
+
+    liga_pago,
+
+    created_at,
+
+    pagado,
+
+    CASE
+      WHEN pagado = true
+      THEN 'Pagado'
+      ELSE 'Pendiente'
+    END as estado
+
+  FROM cliente
+
+  WHERE telefono_cliente = $1
+    AND liga_pago IS NOT NULL
+    AND liga_pago <> ''
+
+  ORDER BY id DESC
+
+  LIMIT 1
+`;
 
     const result =
-      await query(sql, values);
+      await query(sql, [
+        telefono,
+      ]);
+
+    const item =
+      result.rows[0] || null;
 
     return NextResponse.json({
       ok: true,
-      data:
-        result.rows[0] || null,
+
+      data: item
+        ? {
+            ...item,
+
+            metodo_pago:
+              "SPEI",
+
+            metodo_pago_label:
+              "SPEI",
+
+            cuenta_bancaria:
+              item.liga_pago,
+
+            cuentaClabeParaCobro:
+              item.liga_pago,
+          }
+        : null,
     });
   } catch (error) {
     console.error(
