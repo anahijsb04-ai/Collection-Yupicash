@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const id = searchParams.get("id") || "";
 
     const url =
-      `https://cashwemx.vercel.app/api/prestamos/pendientes` +
+      `https://yupi-cash.vercel.app/api/prestamos/pendientes` +
       `?telefono=${encodeURIComponent(telefono)}&limite=50`;
 
     const res = await fetch(url, { cache: "no-store" });

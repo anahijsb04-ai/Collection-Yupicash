@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const limite = searchParams.get("limite") || "1";
 
     const target =
-      `https://cashwemx.vercel.app/api/prestamos/pendientes` +
+      `https://yupi-cash.vercel.app/api/prestamos/pendientes` +
       `?telefono=${encodeURIComponent(telefono)}` +
       `&limite=${encodeURIComponent(limite)}`;
 
