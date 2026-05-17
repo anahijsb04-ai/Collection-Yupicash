@@ -72,8 +72,6 @@ export async function GET(
   FROM cliente
 
   WHERE telefono_cliente = $1
-    AND liga_pago IS NOT NULL
-    AND liga_pago <> ''
 
   ORDER BY id DESC
 
