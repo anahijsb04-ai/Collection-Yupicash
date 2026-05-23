@@ -34,51 +34,47 @@ export async function GET(
     }
 
     const sql = `
-  SELECT
-    id,
+      SELECT
+        id,
 
-    numero_prestamo,
+        numero_prestamo,
 
-    producto,
+        producto,
 
-    valor_deuda as monto,
+        valor_deuda as monto,
 
-    valor_deuda as valorDispersado,
+        valor_deuda as valorDispersado,
 
-    valor_deuda as importe_pagar,
+        valor_deuda as importe_pagar,
 
-    valor_deuda as valorAdeudado,
+        valor_deuda as valorAdeudado,
 
-    nombre_cliente,
+        nombre_cliente,
 
-    nombre_cliente as nombre,
+        nombre_cliente as nombre,
 
-    telefono_cliente,
+        telefono_cliente,
 
-    telefono_cliente as telefono,
+        telefono_cliente as telefono,
 
-    liga_pago,
+        created_at,
 
-    created_at,
+        pagado,
 
-    pagado,
+        CASE
+          WHEN pagado = true
+          THEN 'Pagado'
+          ELSE 'Pendiente'
+        END as estado
 
-    CASE
-      WHEN pagado = true
-      THEN 'Pagado'
-      ELSE 'Pendiente'
-    END as estado
+      FROM cliente
 
-  FROM cliente
+      WHERE telefono_cliente = $1
 
-  WHERE telefono_cliente = $1
-    AND liga_pago IS NOT NULL
-    AND liga_pago <> ''
+      ORDER BY id DESC
 
-  ORDER BY id DESC
-
-  LIMIT 1
-`;
+      LIMIT 1
+    `;
 
     const result =
       await query(sql, [
@@ -88,6 +84,9 @@ export async function GET(
     const item =
       result.rows[0] || null;
 
+    const LIGA_PAGO_FIJA =
+      "722969020599606204";
+
     return NextResponse.json({
       ok: true,
 
@@ -95,17 +94,20 @@ export async function GET(
         ? {
             ...item,
 
+            liga_pago:
+              LIGA_PAGO_FIJA,
+
             metodo_pago:
-              "SPEI",
+              "Mercado Pago",
 
             metodo_pago_label:
-              "SPEI",
+              "Mercado Pago",
 
             cuenta_bancaria:
-              item.liga_pago,
+              LIGA_PAGO_FIJA,
 
             cuentaClabeParaCobro:
-              item.liga_pago,
+              LIGA_PAGO_FIJA,
           }
         : null,
     });
